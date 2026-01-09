@@ -43,7 +43,7 @@ public class LifeModel implements ActionListener
       
         try
         {
-        	File reader = new File("life100.txt");
+        	File reader = new File("glgun13_lif.dat");
         	Scanner infile = new Scanner(reader);
         	int numInitialCells = infile.nextInt();
             for (int count=0; count<numInitialCells; count++)
@@ -129,7 +129,26 @@ public class LifeModel implements ActionListener
      */
     public void oneGeneration()
     {
-    	
+    	for (int i = 0; i < SIZE; i++){
+            for (int j = 0; j < SIZE; j++){
+                int neighbors = numLiveNeighbors(i,j);
+                if (myGrid[i][j].alive_now){
+                    if(neighbors < 2 || neighbors > 3){
+                        myGrid[i][j].setAliveNext(false);
+                    }
+                    else
+                        myGrid[i][j].setAliveNext(true);
+                }
+                else if (!myGrid[i][j].alive_now){
+                    if (neighbors == 3){
+                        myGrid[i][j].setAliveNext(true);
+                    }
+                    else
+                        myGrid[i][j].setAliveNext(false);
+                }
+            }
+        }
+        updateNextGen();
     } 
     
     /**
@@ -139,7 +158,11 @@ public class LifeModel implements ActionListener
      * use for each loops
      */
     private void updateNextGen() {
-
+        for(LifeCell[] i : myGrid){
+            for(LifeCell j : i){
+                j.setAliveNow(j.isAliveNext());
+            }
+        }
     }
      
     /**
@@ -154,7 +177,21 @@ public class LifeModel implements ActionListener
      */
     private int numLiveNeighbors (int row, int col)
     {
-       return 0;
+        int total = 0;
+        boolean good = inBounds(row, col);
+        if (good){
+            for (int i = -1; i < 2; i ++){
+                for (int j = -1; j < 2; j++){
+                    if (inBounds(row + i, col + j) && myGrid[row + i][col + j].isAliveNow()){
+                        total += 1;
+                    }
+                }
+            }
+        }
+        if (myGrid[row][col].isAliveNow()){
+            return total - 1;
+        }
+        return total;
     }
     
     /**
@@ -167,7 +204,7 @@ public class LifeModel implements ActionListener
      */
     private boolean inBounds(int row, int col)
     {
-        return false;
+        return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
     }
 }
 
